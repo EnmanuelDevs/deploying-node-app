@@ -1,0 +1,40 @@
+name: CI/CD Node.js to Render
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Run Test
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Download code
+        uses: actions/checkout@v4
+      
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+      
+      - name: Run Test
+        run: npm test
+
+  deploy:
+    name: Deploy in Render
+
+    needs: test
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run Deploy Hook of Render
+        run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
